@@ -5,6 +5,9 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 const App = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState({});
+    const [order, setOrder] = useState({});
+    const [errorMessage, setErrorMessage] = useState('');
+
     /**
      * Get product from api
      */
@@ -52,6 +55,23 @@ const App = () => {
         setCart(cart);
     }
 
+    const refresh = async () =>{
+        const newCart = commerce.cart.refresh();
+        setCart(newCart);
+    }
+
+    const handleCheckoutCapture = async (checkoutTokenId, newOrder) =>{
+        try {
+            const incommingOrder = await commerce.checkout.capture(checkoutTokenId, newOrder);
+            setOrder(incommingOrder);
+            refresh();
+        } catch (error) {
+            console.log(error);
+            setErrorMessage(error.data.error.message);
+        }
+
+    }
+
     /**
      * This function will call at the first time after reloading page
      */
@@ -71,7 +91,12 @@ const App = () => {
                         <Cart cart={cart} handleEmptyCart={handleEmptyCart} handleRemoveCart={handleRemoveCart} handleUpdateCartQty={handleUpdateCartQty} />
                     </Route>
                     <Route exact path="/checkout">
-                        <Checkout cart={cart} />
+                        <Checkout 
+                            cart={cart}
+                            order={order}
+                            handleCheckoutCapture={handleCheckoutCapture}
+                            errorMessage={errorMessage}
+                        />
                     </Route>
                 </Switch>
             </div>
