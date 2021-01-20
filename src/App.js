@@ -2,17 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { Navbar, Products, Cart, Checkout } from './components';
 import { commerce } from './lib/commerce';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { CircularProgress, makeStyles, Backdrop } from '@material-ui/core';
+
+const useStyle = makeStyles((theme) => ({
+    backdrop : {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff'
+    },
+}));
+
 const App = () => {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState({});
     const [order, setOrder] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+
+    const classes = useStyle();
 
     /**
      * Get product from api
      */
     const fetchProduct = async () => {
         const { data } = await commerce.products.list();
+        setIsLoading(false);
         setProducts(data);
     }
 
@@ -45,22 +58,22 @@ const App = () => {
      * Remove item from cart
      * @param {Cart id to delete} itemId 
      */
-    const handleRemoveCart = async(itemId) =>{
+    const handleRemoveCart = async (itemId) => {
         const item = await commerce.cart.remove(itemId);
         setCart(item.cart);
     }
 
-    const handleUpdateCartQty = async(itemId, quantity) =>{
-        const {cart} = await commerce.cart.update(itemId, { quantity })
+    const handleUpdateCartQty = async (itemId, quantity) => {
+        const { cart } = await commerce.cart.update(itemId, { quantity })
         setCart(cart);
     }
 
-    const refresh = async () =>{
+    const refresh = async () => {
         const newCart = commerce.cart.refresh();
         setCart(newCart);
     }
 
-    const handleCheckoutCapture = async (checkoutTokenId, newOrder) =>{
+    const handleCheckoutCapture = async (checkoutTokenId, newOrder) => {
         try {
             const incommingOrder = await commerce.checkout.capture(checkoutTokenId, newOrder);
             setOrder(incommingOrder);
@@ -85,13 +98,13 @@ const App = () => {
                 <Navbar cart={cart} />
                 <Switch>
                     <Route exact path='/'>
-                        <Products products={products} handleAddToCart={handleAddToCart} />
+                        {isLoading ? <Backdrop className={classes.backdrop} open={isLoading} ><CircularProgress color='inherit'/></Backdrop> : <Products products={products} handleAddToCart={handleAddToCart} />}
                     </Route>
                     <Route exact path='/cart'>
                         <Cart cart={cart} handleEmptyCart={handleEmptyCart} handleRemoveCart={handleRemoveCart} handleUpdateCartQty={handleUpdateCartQty} />
                     </Route>
                     <Route exact path="/checkout">
-                        <Checkout 
+                        <Checkout
                             cart={cart}
                             order={order}
                             handleCheckoutCapture={handleCheckoutCapture}

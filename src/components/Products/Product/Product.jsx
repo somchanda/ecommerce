@@ -41,7 +41,7 @@ const Product = ({ product, handleAddToCart }) => {
                 </DialogTitle>
                 <DialogContent>
                     <ImageSlider assets={product.assets.filter(asset => asset.is_image == true)} product={product}/>
-                    <DialogContentText style={{ backgroundColor: '#c9e2e6', padding: '10px', borderRadius: '5px' }}>
+                    <DialogContentText style={{padding: '10px', borderRadius: '5px' }}>
                         <Typography dangerouslySetInnerHTML={{ __html: product.description }} variant="body2" color="textSecondary"></Typography>
                     </DialogContentText>
                 </DialogContent>
