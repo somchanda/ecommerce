@@ -1,0 +1,146 @@
+diff --git a/src/App.js b/src/App.js
+index a087bde..4b43fbd 100644
+--- a/src/App.js
++++ b/src/App.js
+@@ -27,6 +27,7 @@ const App = () => {
+         const { data } = await commerce.products.list();
+         setIsLoading(false);
+         setProducts(data);
++        console.log(data);
+     }
+ 
+     /**
+diff --git a/src/components/Products/Product/ImageSlider.jsx b/src/components/Products/Product/ImageSlider.jsx
+index 5c748a0..eb3fef8 100644
+--- a/src/components/Products/Product/ImageSlider.jsx
++++ b/src/components/Products/Product/ImageSlider.jsx
+@@ -1,5 +1,5 @@
+ import React, { useState } from 'react';
+-import { CardMedia, IconButton } from '@material-ui/core';
++import { Card, CardContent, CardMedia, IconButton } from '@material-ui/core';
+ import useStyles from './style';
+ import { ArrowBack, ArrowForward } from '@material-ui/icons';
+ 
+@@ -19,23 +19,25 @@ const ImageSlider = ({ assets, product }) => {
+           setIndex(nextIndex);
+         }
+       };
+-    console.log(assets.length);
+     return assets.length <= 1 ? (
+-        <div>
++        <Card>
+             <CardMedia className={classes.media} image={product.media.source} title={product.name} />
+-        </div>
++        </Card>
+     ) : (
+-            <div>
+-                <CardMedia className={classes.media} image={assets[index].url} title={product.name} />
+-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+-                    <IconButton aria-label="Back" onClick={slideLeft}>
+-                        <ArrowBack />
+-                    </IconButton>
+-                    <IconButton aria-label="Next" onClick={slideRight}>
+-                        <ArrowForward />
+-                    </IconButton>
+-                </div>
+-            </div>
+-        );
++      <Card>
++        <CardMedia className={classes.media} image={assets[index].url} title={product.name} />
++        <CardContent>
++          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
++            <IconButton aria-label="Back" onClick={slideLeft}>
++              <ArrowBack />
++            </IconButton>
++            <IconButton aria-label="Next" onClick={slideRight}>
++              <ArrowForward />
++            </IconButton>
++          </div>
++        </CardContent>
++      </Card>
++
++    );
+ }
+ export default ImageSlider;
+\ No newline at end of file
+diff --git a/src/components/Products/Product/Product.jsx b/src/components/Products/Product/Product.jsx
+index c86d490..69834f8 100644
+--- a/src/components/Products/Product/Product.jsx
++++ b/src/components/Products/Product/Product.jsx
+@@ -1,10 +1,14 @@
+ import React, { useState } from 'react';
+-import { Card, CardMedia, CardActions, Typography, IconButton, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@material-ui/core';
++import { Card, CardMedia, CardActions, Typography, IconButton, CardContent, Dialog, Slide, AppBar, Toolbar, List, ListItem, ListItemText, Divider, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@material-ui/core';
+ import { AddShoppingCart } from '@material-ui/icons';
+ import ImageSlider from './ImageSlider';
++import CloseIcon from '@material-ui/icons/Close';
+ 
+ import useStyles from './style'
+ 
++const Transition = React.forwardRef(function Transition(props, ref) {
++    return <Slide direction="up" ref={ref} {...props} />;
++});
+ const Product = ({ product, handleAddToCart }) => {
+     const classes = useStyles();
+     const [open, setOpen] = useState(false);
+@@ -32,7 +36,7 @@ const Product = ({ product, handleAddToCart }) => {
+                     </IconButton>
+                 </CardActions>
+             </Card>
+-            <Dialog open={open} fullWidth={true} onClose={handleClose} aria-labelledby="form-dialog-title">
++            {/* <Dialog open={open} fullWidth={true} onClose={handleClose} aria-labelledby="form-dialog-title">
+                 <DialogTitle id="form-dialog-title">
+                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                         <div>{product.name}</div>
+@@ -48,6 +52,29 @@ const Product = ({ product, handleAddToCart }) => {
+                 <DialogActions>
+                     <Button color="primary" onClick={handleClose}>Close</Button>
+                 </DialogActions>
++            </Dialog> */}
++            <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
++                <AppBar position="static" className={classes.appBar}>
++                    <Toolbar>
++                        <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
++                            <CloseIcon />
++                        </IconButton>
++                        <Typography variant="h6" className={classes.title}>
++                            {product.name}
++                        </Typography>
++                    </Toolbar>
++                </AppBar>
++                
++                <ImageSlider assets={product.assets.filter(asset => asset.is_image == true)} product={product}/>
++                {/* <List>
++                    <ListItem button>
++                        <ListItemText primary="Phone ringtone" secondary="Titania" />
++                    </ListItem>
++                    <Divider />
++                    <ListItem button>
++                        <ListItemText primary="Default notification ringtone" secondary="Tethys" />
++                    </ListItem>
++                </List> */}
+             </Dialog>
+         </div>
+     )
+diff --git a/src/components/Products/Product/style.js b/src/components/Products/Product/style.js
+index d619303..a576b91 100644
+--- a/src/components/Products/Product/style.js
++++ b/src/components/Products/Product/style.js
+@@ -7,6 +7,7 @@ export default makeStyles(() => ({
+   media: {
+     height: 0,
+     paddingTop: '56.25%', // 16:9
++    backgroundSize: "contain", 
+   },
+   cardActions: {
+     display: 'flex',
+@@ -16,4 +17,8 @@ export default makeStyles(() => ({
+     display: 'flex',
+     justifyContent: 'space-between',
+   },
++  appBar:{
++    backgroundColor: 'inherit',
++    color: "inherit"
++  }
+ }));
+\ No newline at end of file

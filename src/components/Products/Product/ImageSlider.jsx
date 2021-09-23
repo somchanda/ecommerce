@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CardMedia, IconButton } from '@material-ui/core';
+import { Card, CardContent, CardMedia, IconButton } from '@material-ui/core';
 import useStyles from './style';
 import { ArrowBack, ArrowForward } from '@material-ui/icons';
 
@@ -19,23 +19,25 @@ const ImageSlider = ({ assets, product }) => {
           setIndex(nextIndex);
         }
       };
-    console.log(assets.length);
     return assets.length <= 1 ? (
-        <div>
+        <Card>
             <CardMedia className={classes.media} image={product.media.source} title={product.name} />
-        </div>
+        </Card>
     ) : (
-            <div>
-                <CardMedia className={classes.media} image={assets[index].url} title={product.name} />
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <IconButton aria-label="Back" onClick={slideLeft}>
-                        <ArrowBack />
-                    </IconButton>
-                    <IconButton aria-label="Next" onClick={slideRight}>
-                        <ArrowForward />
-                    </IconButton>
-                </div>
-            </div>
-        );
+      <Card>
+        <CardMedia className={classes.media} image={assets[index].url} title={product.name} />
+        <CardContent>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <IconButton aria-label="Back" onClick={slideLeft}>
+              <ArrowBack />
+            </IconButton>
+            <IconButton aria-label="Next" onClick={slideRight}>
+              <ArrowForward />
+            </IconButton>
+          </div>
+        </CardContent>
+      </Card>
+
+    );
 }
 export default ImageSlider;

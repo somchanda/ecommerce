@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { Card, CardMedia, CardActions, Typography, IconButton, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@material-ui/core';
+import { Card, CardMedia, CardActions, Typography, IconButton, CardContent, Dialog, Slide, AppBar, Toolbar, List, ListItem, ListItemText, Divider, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@material-ui/core';
 import { AddShoppingCart } from '@material-ui/icons';
 import ImageSlider from './ImageSlider';
+import CloseIcon from '@material-ui/icons/Close';
 
 import useStyles from './style'
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
 const Product = ({ product, handleAddToCart }) => {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
@@ -32,7 +36,7 @@ const Product = ({ product, handleAddToCart }) => {
                     </IconButton>
                 </CardActions>
             </Card>
-            <Dialog open={open} fullWidth={true} onClose={handleClose} aria-labelledby="form-dialog-title">
+            {/* <Dialog open={open} fullWidth={true} onClose={handleClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <div>{product.name}</div>
@@ -48,6 +52,29 @@ const Product = ({ product, handleAddToCart }) => {
                 <DialogActions>
                     <Button color="primary" onClick={handleClose}>Close</Button>
                 </DialogActions>
+            </Dialog> */}
+            <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
+                <AppBar position="static" className={classes.appBar}>
+                    <Toolbar>
+                        <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
+                            <CloseIcon />
+                        </IconButton>
+                        <Typography variant="h6" className={classes.title}>
+                            {product.name}
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
+                
+                <ImageSlider assets={product.assets.filter(asset => asset.is_image == true)} product={product}/>
+                {/* <List>
+                    <ListItem button>
+                        <ListItemText primary="Phone ringtone" secondary="Titania" />
+                    </ListItem>
+                    <Divider />
+                    <ListItem button>
+                        <ListItemText primary="Default notification ringtone" secondary="Tethys" />
+                    </ListItem>
+                </List> */}
             </Dialog>
         </div>
     )

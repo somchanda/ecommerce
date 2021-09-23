@@ -27,6 +27,7 @@ const App = () => {
         const { data } = await commerce.products.list();
         setIsLoading(false);
         setProducts(data);
+        console.log(data);
     }
 
     /**
